@@ -1,0 +1,122 @@
+#include <iostream>
+#include <sstream> 
+#include <iomanip> 
+using namespace std;
+
+// net hesaplamak için gereken int denklemleri ektedir
+float calculateNet(int dogru, int yanlıs) {
+    return dogru - (yanlıs / 4.0);
+}
+
+// TYT total net ve anlamlı sözler ektedir
+string categorizeNet(float net) {
+    if (net < 30) return "Kotu";
+    else if (net >= 30 && net < 50) return "Orta";
+    else if (net >= 50 && net < 70) return "Iyı";
+    else if (net >= 70 && net < 90) return "Cok ıyı";
+    else if (net >= 90 && net <= 120) return "Harika";
+    else return "Hatalı Net";
+}
+
+int main() {
+    // diğer varyantlar ektedir
+    int tyt_dogru[4] = {0}, tyt_yanlıs[4] = {0};
+    int ayt_dogru[4] = {0}, ayt_yanlıs[4] = {0};
+    float obp = 0.0; // OBP
+
+    // Subjects
+    string tyt_dersler[] = {"Türkçe", "Matematik", "Sosyal Bilimler", "Fen Bilimleri"};
+    string ayt_dersler[] = {"Matematik", "Fen Bilimleri", "Edebiyat-Sosyal Bilimler", "Sosyal Bilimler 2"};
+
+    // TYT INPUT
+    cout << "TYT Doğru ve Yanlış Sayılarını Girin (Doğru Yanlış şeklinde, her satır bir ders için):\n";
+    for (int i = 0; i < 4; i++) {
+        cout << tyt_dersler[i] << ": ";
+        string input_line;
+        getline(cin, input_line);
+        istringstream iss(input_line);
+        if (!(iss >> tyt_dogru[i] >> tyt_yanlıs[i]) || tyt_dogru[i] < 0 || tyt_yanlıs[i] < 0) {
+            cerr << "Geçersiz giriş! Lütfen " << tyt_dersler[i] << " için doğru ve yanlışları tekrar girin.\n";
+            i--; // Tekrar giriş al
+        }
+    }
+
+    // Calculate TYT nets
+    float tyt_nets[4];
+    float tyt_total_net = 0.0;
+    for (int i = 0; i < 4; i++) {
+        tyt_nets[i] = calculateNet(tyt_dogru[i], tyt_yanlıs[i]);
+        tyt_total_net += tyt_nets[i];
+    }
+
+    // AYT oturumunda dalga geçmek yok çünkü bende yapamıyorum :(
+    cout << "\nAYT Doğru ve Yanlış Sayılarını Girin (Doğru Yanlış şeklinde, her satır bir ders için):\n";
+    for (int i = 0; i < 4; i++) {
+        cout << ayt_dersler[i] << ": ";
+        string input_line;
+        getline(cin, input_line);
+        istringstream iss(input_line);
+        if (!(iss >> ayt_dogru[i] >> ayt_yanlıs[i]) || ayt_dogru[i] < 0 || ayt_yanlıs[i] < 0) {
+            cerr << "Geçersiz giriş! Lütfen " << ayt_dersler[i] << " için doğru ve yanlışları tekrar girin.\n";
+            i--; // Tekrar giriş al
+        }
+    }
+
+    // AYT net hesaplama
+    float ayt_nets[4];
+    float ayt_total_net = 0.0;
+    for (int i = 0; i < 4; i++) {
+        ayt_nets[i] = calculateNet(ayt_dogru[i], ayt_yanlıs[i]);
+        ayt_total_net += ayt_nets[i];
+    }
+
+    // OBP
+    cout << "\nOrtaöğretim Başarı Puanınızı Girin (Diploma Notu): ";
+    while (!(cin >> obp) || obp < 0 || obp > 100) {
+        cerr << "Geçersiz giriş! Lütfen 0 ile 100 arasında bir değer girin: ";
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+    obp = obp * 0.6; // OBP hesaplaması
+
+    // TYT için puan hesaplama
+    float tyt_score = (tyt_nets[0] * 1.32) + (tyt_nets[1] * 1.32) + (tyt_nets[2] * 0.44) + (tyt_nets[3] * 0.44);
+
+    // AYT için puan hesaplama
+    float sayisal_score = (ayt_nets[0] * 3) + (ayt_nets[1] * 3) + (tyt_score * 0.4) + obp;
+    float esitagirlik_score = (ayt_nets[0] * 3) + (ayt_nets[2] * 3) + (tyt_score * 0.4) + obp;
+    float sozel_score = (ayt_nets[2] * 3) + (ayt_nets[3] * 3) + (tyt_score * 0.4) + obp;
+
+    // TYT ıcın katogorı
+    string tyt_category = categorizeNet(tyt_total_net);
+
+    // Display results
+    cout << fixed << setprecision(2); // Set precision to 2 decimal places
+    cout << "\nSonuçlar:\n";
+    cout << "TYT Net Toplamı: " << tyt_total_net << " (" << tyt_category << ")\n";
+    cout << "AYT Net Toplamı: " << ayt_total_net << endl;
+    cout << "SAYISAL YERLESTIRME PUANINIZ:" << ( tyt_score + sayisal_score ) << endl; 
+    cout << "ESIT AGIRLIK YERLESTIRME PUANINIZ:" << ( tyt_score + esitagirlik_score) << endl;
+    cout << "SOZEL YERLESTIRME PUANINIZ:" << ( tyt_score + sozel_score ) << endl; 
+    cout << "TYT Puanı     : " << tyt_score << endl;
+    cout << "Sayısal Puanı : " << sayisal_score << endl;
+    cout << "Eşit Ağırlık  : " << esitagirlik_score << endl;
+    cout << "Sözel Puanı   : " << sozel_score << endl;
+
+
+    cout << "   *****     *****   \n";
+    cout << "  *******   *******  \n";
+    cout << " ********* ********* \n";
+    cout << " ******************* \n";
+    cout << "  *****************  \n";
+    cout << "   ***************   \n";
+    cout << "     ***********    \n";
+    cout << "       *******    \n";
+    cout << "         ***   \n";
+    cout << "          *    \n";
+    
+    
+    
+
+    return 0;
+}
